@@ -77,7 +77,7 @@ export const CommandCenter: React.FC = () => {
                   : "text-red-400"
               }`}
             >
-              {val}
+              {String(val)}
             </span>
           </div>
         ))}
