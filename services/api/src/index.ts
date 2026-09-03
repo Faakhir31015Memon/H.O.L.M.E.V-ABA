@@ -3,9 +3,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { createServer } from "http";
 import { WebSocketServer, WebSocket } from "ws";
-import { ToolRegistry } from "./tools/ToolRegistry.js";
-import { HOLMEVBrain } from "./ai/Brain.js";
-import { createApiRouter } from "./routes/api.js";
+import { ToolRegistry } from "./tools/ToolRegistry";
+import { HOLMEVBrain } from "./ai/Brain";
+import { createApiRouter } from "./routes/api";
 
 dotenv.config();
 

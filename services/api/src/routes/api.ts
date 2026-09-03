@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { HOLMEVBrain } from "../ai/Brain.js";
-import { ToolRegistry } from "../tools/ToolRegistry.js";
+import { HOLMEVBrain } from "../ai/Brain";
+import { ToolRegistry } from "../tools/ToolRegistry";
 import { SystemHealthStatus } from "@holmev/shared-types";
 
 export function createApiRouter(brain: HOLMEVBrain, toolRegistry: ToolRegistry): Router {

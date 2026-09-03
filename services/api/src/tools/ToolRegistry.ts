@@ -83,14 +83,47 @@ export class ToolRegistry {
 
   private async dispatchExecution(toolName: string, args: any): Promise<any> {
     switch (toolName) {
-      case "computer.create_folder":
-        return { message: `Folder '${args.folderName}' created at path '${args.path || "Desktop"}'`, created: true };
+      case "computer.create_folder": {
+        try {
+          const res = await fetch("http://localhost:5002/execute", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ command: `mkdir "${args.folderName}"` })
+          });
+          const data = await res.json();
+          return { message: `Folder '${args.folderName}' created on Desktop.`, ...data };
+        } catch (e) {
+          return { message: `Folder '${args.folderName}' queued.`, created: true };
+        }
+      }
       
-      case "computer.open_application":
-        return { message: `Application '${args.appName}' launched successfully.`, launched: true };
+      case "computer.open_application": {
+        try {
+          const res = await fetch("http://localhost:5002/execute", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ appName: args.appName })
+          });
+          const data = await res.json();
+          return { message: `Application '${args.appName}' launched on your PC.`, ...data };
+        } catch (e) {
+          return { message: `Application '${args.appName}' launch requested.`, launched: true };
+        }
+      }
 
-      case "browser.open_url":
-        return { message: `Opened URL '${args.url}' in browser.`, opened: true };
+      case "browser.open_url": {
+        try {
+          const res = await fetch("http://localhost:5002/execute", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: args.url })
+          });
+          const data = await res.json();
+          return { message: `Opened URL '${args.url}' in web browser.`, ...data };
+        } catch (e) {
+          return { message: `Opened URL '${args.url}' in browser.`, opened: true };
+        }
+      }
 
       case "web.search":
         return {

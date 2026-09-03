@@ -1,5 +1,5 @@
-import { ModelRouter } from "./ModelRouter.js";
-import { ToolRegistry } from "../tools/ToolRegistry.js";
+import { ModelRouter } from "./ModelRouter";
+import { ToolRegistry } from "../tools/ToolRegistry";
 import { EmotionMood, PermissionLevel, ToolExecutionResult } from "@holmev/shared-types";
 
 export interface BrainProcessResult {
