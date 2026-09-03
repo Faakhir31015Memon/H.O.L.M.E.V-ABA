@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import * as React from "react";
+import { useEffect, useState } from "react";
 import { VoiceState, EmotionMood } from "@holmev/shared-types";
 import { VoiceManager } from "./services/VoiceManager";
 import { HolmevCoreVisualizer } from "./components/HolmevCoreVisualizer";
