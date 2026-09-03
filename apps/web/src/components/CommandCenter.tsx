@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import * as React from "react";
+import { useEffect, useState } from "react";
 import { SystemHealthStatus } from "@holmev/shared-types";
 import { Activity, ShieldCheck, Cpu, HardDrive, Wifi, CheckCircle2, AlertTriangle } from "lucide-react";
 
