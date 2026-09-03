@@ -155,7 +155,7 @@ export class VoiceManager {
     this.recognition = new SpeechRecognition();
     this.recognition.continuous = true;
     this.recognition.interimResults = true;
-    this.recognition.lang = "en-US"; // Multi-lingual natural support
+    this.recognition.lang = this.selectedLang; // Multi-lingual natural support (ur-PK, en-US)
 
     this.recognition.onresult = (event: any) => {
       let interimTranscript = "";
@@ -195,6 +195,12 @@ export class VoiceManager {
         } catch (_) {}
       }
     };
+  }
+
+  public sendTextMessage(text: string) {
+    this.unlockAudioContext();
+    this.notifyTranscript(text, true);
+    this.processUserUtterance(text);
   }
 
   private startListening() {
@@ -245,6 +251,33 @@ export class VoiceManager {
     }
   }
 
+  private selectedLang: string = "ur-PK";
+
+  public setLanguage(lang: string) {
+    this.selectedLang = lang;
+    if (this.recognition) {
+      this.recognition.lang = lang;
+    }
+  }
+
+  public unlockAudioContext() {
+    try {
+      if (!this.audioContext) {
+        this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      if (this.audioContext.state === "suspended") {
+        this.audioContext.resume();
+      }
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.resume();
+        window.speechSynthesis.getVoices();
+      }
+      console.log("[VoiceManager] Audio & Speech context unlocked successfully.");
+    } catch (e) {
+      console.warn("[VoiceManager] Audio unlock error:", e);
+    }
+  }
+
   // ==========================================
   // AUTHORITATIVE SINGLE TTS STREAM
   // ==========================================
@@ -252,7 +285,12 @@ export class VoiceManager {
     // RULE: Cancel any previous speech output before starting new
     this.stopSpeaking();
 
-    if (!("speechSynthesis" in window)) return;
+    if (!("speechSynthesis" in window)) {
+      console.warn("[VoiceManager] Speech synthesis not supported in this browser.");
+      return;
+    }
+
+    this.unlockAudioContext();
 
     this.setState("SPEAKING");
     this.activeAudioSessions = 1;
@@ -260,6 +298,17 @@ export class VoiceManager {
     this.currentUtterance = new SpeechSynthesisUtterance(text);
     this.currentUtterance.rate = 1.0;
     this.currentUtterance.pitch = 0.95; // Male JARVIS-style tone
+
+    // Try to pick a natural voice if available
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      const preferredVoice = voices.find(
+        (v) => v.lang.includes("ur") || v.lang.includes("hi") || v.lang.includes("en-US") || v.name.includes("Google") || v.name.includes("Natural")
+      );
+      if (preferredVoice) {
+        this.currentUtterance.voice = preferredVoice;
+      }
+    }
 
     this.currentUtterance.onend = () => {
       this.activeAudioSessions = 0;
@@ -269,7 +318,8 @@ export class VoiceManager {
       }
     };
 
-    this.currentUtterance.onerror = () => {
+    this.currentUtterance.onerror = (e) => {
+      console.warn("[VoiceManager] TTS playback error:", e);
       this.activeAudioSessions = 0;
       this.currentUtterance = null;
       if (this.state !== "DEACTIVATED") {
@@ -277,6 +327,7 @@ export class VoiceManager {
       }
     };
 
+    window.speechSynthesis.resume();
     window.speechSynthesis.speak(this.currentUtterance);
   }
 

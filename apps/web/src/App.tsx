@@ -42,18 +42,35 @@ export const App: React.FC = () => {
     };
   }, []);
 
+  const [inputText, setInputText] = useState<string>("");
+  const [selectedLang, setSelectedLang] = useState<string>("ur-PK");
+
   const handleMoodChange = (newMood: EmotionMood) => {
     setMood(newMood);
     VoiceManager.getInstance().setMood(newMood);
   };
 
+  const handleLangChange = (lang: string) => {
+    setSelectedLang(lang);
+    VoiceManager.getInstance().setLanguage(lang);
+  };
+
   const toggleMic = () => {
     const mgr = VoiceManager.getInstance();
-    if (voiceState === "DEACTIVATED" || voiceState === "IDLE") {
+    mgr.unlockAudioContext();
+    if (voiceState === "DEACTIVATED" || voiceState === "IDLE" || voiceState === "ERROR") {
       mgr.initializeMicrophone();
     } else {
       mgr.deactivateSession();
     }
+  };
+
+  const handleSendMessage = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!inputText.trim()) return;
+    const mgr = VoiceManager.getInstance();
+    mgr.sendTextMessage(inputText.trim());
+    setInputText("");
   };
 
   return (
@@ -138,7 +155,32 @@ export const App: React.FC = () => {
             <div className="md:col-span-8 flex flex-col items-center justify-center glass-panel p-6 rounded-2xl border border-jarvis-border/40 min-h-[420px]">
               <HolmevCoreVisualizer voiceState={voiceState} audioLevel={audioLevel} mood={mood} />
               
-              <div className="mt-4 w-full max-w-md">
+              {/* Interactive Voice & Text Command Console */}
+              <div className="mt-4 w-full max-w-xl flex flex-col gap-3">
+                <form onSubmit={handleSendMessage} className="flex items-center gap-2 bg-black/60 p-2 rounded-xl border border-jarvis-cyan/30 shadow-[0_0_15px_rgba(0,243,255,0.15)]">
+                  <input
+                    type="text"
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder="Type or speak a command (e.g., 'Chrome kholo', 'Weather kaisa hai')..."
+                    className="flex-1 bg-transparent px-3 py-2 text-xs font-mono text-white placeholder-gray-500 focus:outline-none"
+                  />
+                  <select
+                    value={selectedLang}
+                    onChange={(e) => handleLangChange(e.target.value)}
+                    className="bg-black/80 text-jarvis-cyan text-[11px] font-mono px-2 py-1.5 rounded border border-jarvis-cyan/30 focus:outline-none"
+                  >
+                    <option value="ur-PK">Urdu / Hindi</option>
+                    <option value="en-US">English (US)</option>
+                  </select>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-lg bg-jarvis-cyan/20 hover:bg-jarvis-cyan/30 text-jarvis-cyan font-mono font-bold text-xs border border-jarvis-cyan/50 transition-all flex items-center gap-1.5"
+                  >
+                    Send
+                  </button>
+                </form>
+
                 <VoiceDiagnosticsPanel
                   voiceState={voiceState}
                   activeSessions={activeSessions}
