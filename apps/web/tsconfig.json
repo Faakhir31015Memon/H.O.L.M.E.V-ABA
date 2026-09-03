@@ -17,7 +17,6 @@
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "types": ["react", "react-dom", "three"],
     "typeRoots": ["./node_modules/@types", "../../node_modules/@types"]
   },
   "include": ["src"]
