@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import * as React from "react";
+import { useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Grid, Box, Sphere, Cylinder } from "@react-three/drei";
 import { CircuitComponent, CircuitSimulationResult } from "@holmev/shared-types";
