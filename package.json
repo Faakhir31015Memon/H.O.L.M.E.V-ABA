@@ -1,0 +1,31 @@
+{
+  "name": "holmev-master-os",
+  "version": "1.0.0",
+  "private": true,
+  "description": "H.O.L.M.E.V — Ultimate Multimodal Personal AI Operating System",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\" \"npm run dev:desktop\"",
+    "dev:web": "npm --prefix apps/web run dev",
+    "dev:api": "npm --prefix services/api run dev",
+    "dev:desktop": "npm --prefix apps/desktop-agent run dev",
+    "dev:python:vision": "cd python-services/vision_emotion && python -m uvicorn service:app --port 8001 --reload",
+    "dev:python:circuit": "cd python-services/circuit_sim && python -m uvicorn service:app --port 8002 --reload",
+    "build": "npm run build:types && npm run build:api && npm run build:web && npm run build:desktop",
+    "build:types": "npm --prefix packages/shared-types run build",
+    "build:web": "npm --prefix apps/web run build",
+    "build:api": "npm --prefix services/api run build",
+    "build:desktop": "npm --prefix apps/desktop-agent run build",
+    "typecheck": "npm --prefix packages/shared-types run typecheck && npm --prefix services/api run typecheck && npm --prefix apps/web run typecheck && npm --prefix apps/desktop-agent run typecheck",
+    "lint": "npm --prefix apps/web run lint",
+    "test": "npm --prefix services/api test && npm --prefix apps/web test"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.4.5"
+  }
+}
